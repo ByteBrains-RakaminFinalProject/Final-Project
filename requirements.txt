@@ -1,2 +1,4 @@
 pip --upgrade pip
+setuptools --upgrade
+wheel --upgrade
 matplotlib
