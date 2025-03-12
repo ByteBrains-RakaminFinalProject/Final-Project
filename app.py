@@ -105,34 +105,26 @@ elif menu == "Department":
     sns.countplot(data=filtered_df, x='Attrition', ax=ax)
     st.pyplot(fig)
 
-elif menu == "Prediction" :
+elif menu == "Prediction":
 
     # Load Model Random Forest
     model_RF = joblib.load('modelrf.sav')
-    
+
     # Streamlit App
     st.cache_data.clear()
     st.title('Employee Attrition Prediction')
-    st.markdown(
-        """
-        <div style="background-color:#000000; padding:10px; border-radius:5px">
-            <h4 style="color:#faf7f7;"> This app predicts employee attrition based on key work-related factors 🚀. Enter the details and get an instant prediction!</h4>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    
+
     # Encoding Mapping
-    marital_status_options = ['Single', 'Married', 'Divorced']
-    overtime_options = ['No', 'Yes']
-    
+    marital_mapping = {"Single": 1, "Married": 0, "Divorced": 2}
+    overtime_mapping = {"No": 0, "Yes": 1}
+
     # Input Form
     with st.container():
         st.header('Enter Employee Details')
         col1, col2 = st.columns(2)
         with col1:
-            marital = st.selectbox("Marital Status", marital_status_options)
-            overtime_status = st.selectbox("Overtime", overtime_options)
+            marital = st.selectbox("Marital Status", marital_mapping.keys())
+            overtime_status = st.selectbox("Overtime", overtime_mapping.keys())
             total_working_years = st.number_input("Total Working Years", min_value=0, max_value=40, value=5)
             avg_hours_per_day = st.number_input("Average Hours Per Day", min_value=0, max_value=24, value=8)
     
@@ -143,12 +135,12 @@ elif menu == "Prediction" :
             monthly_income = st.number_input("Monthly Income", min_value=0, max_value=100000, value=5000)
             years_with_curr_manager = st.number_input("Years With Current Manager", min_value=0, max_value=40, value=3)
             job_satisfaction_4 = st.selectbox("Job Satisfaction (1 to 4)", [1, 2, 3, 4])
-    
+
     # Encode Input Data
     encoded_input = {
-        'MaritalStatus_1': [1 if marital == "Married" else 0],
+        'MaritalStatus': [marital_mapping[marital]],
         'MonthlyIncome': [monthly_income],
-        'Overtime': [1 if overtime_status == "Yes" else 0],
+        'Overtime': [overtime_mapping[overtime_status]],
         'JobSatisfaction_4': [1 if job_satisfaction_4 == 4 else 0],
         'TotalWorkingYears': [total_working_years],
         'avg_hours_per_day': [avg_hours_per_day],
@@ -157,20 +149,26 @@ elif menu == "Prediction" :
         'YearsWithCurrManager': [years_with_curr_manager],
         'Age': [age]  
     }
-    
+
     df = pd.DataFrame.from_dict(encoded_input)
-    
+    df.fillna(0, inplace=True)  # Handle missing values
+    df = df.astype(float)  # Ensure numeric format
+
+    # Debugging: Check features before prediction
+    st.write("Model Expected Features:", model_RF.feature_names_in_)
+    st.write("Provided Features:", df.columns.tolist())
+
     # Sidebar for Prediction
     with st.sidebar:
         st.write("# Employee Attrition Prediction")
         st.info("The prediction is based on a machine learning model")
         button = st.button("Predict", type='primary')
-        
+
         if button:
             st.markdown("---")
-            prediction = model_RF.predict(df)
-            result = "Yes, employee is likely to leave" if prediction[0] == 1 else "No, employee is likely to stay"
-            st.write(f"## Prediction: {result}")
-
-st.sidebar.write("Made by ByteBrains")
-
+            try:
+                prediction = model_RF.predict(df)
+                result = "Yes, employee is likely to leave" if prediction[0] == 1 else "No, employee is likely to stay"
+                st.write(f"## Prediction: {result}")
+            except Exception as e:
+                st.error(f"Prediction Error: {e}")  # Catch errors and display them
