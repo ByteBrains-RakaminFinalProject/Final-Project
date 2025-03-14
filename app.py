@@ -2,7 +2,7 @@
 # coding: utf-8
 
 # In[1]:
-
+pip install scikit-learn==1.3.1
 
 import streamlit as st
 import pandas as pd
