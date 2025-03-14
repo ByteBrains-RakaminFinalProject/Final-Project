@@ -137,7 +137,7 @@ elif menu == "Prediction":
 
     # Encode Input Data
     encoded_input = {
-        'MaritalStatus': [marital_mapping[marital]],
+        'MaritalStatus_1': [1 if marital_mapping[marital] == 1 else 0 ],
         'MonthlyIncome': [monthly_income],
         'Overtime': [overtime_mapping[overtime_status]],
         'JobSatisfaction_4': [1 if job_satisfaction_4 == 4 else 0],
