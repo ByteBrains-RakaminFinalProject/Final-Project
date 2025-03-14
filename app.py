@@ -108,7 +108,7 @@ elif menu == "Department":
 elif menu == "Prediction" :
 
     # Load Model Random Forest
-    model = joblib.load('modelcb.sav')
+    model = joblib.load('cbmodel.sav')
     
     # Streamlit App
     st.cache_data.clear()
