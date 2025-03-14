@@ -3,6 +3,6 @@ streamlit==1.30.0
 numpy
 pandas
 scikit-learn==1.2
-catboost==1.1
+catboost=1.2.7
 seaborn
 joblib
